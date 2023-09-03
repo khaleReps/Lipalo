@@ -1,0 +1,34 @@
+{% extends 'base_internal.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Settings</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mb-3">
+            <div class="card-header">
+                User Information
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="{{ user_profile.first_name.id_for_label }}" class="form-label">First Name</label>
+                    {{ user_profile.first_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ user_profile.last_name.id_for_label }}" class="form-label">Last Name</label>
+                    {{ user_profile.last_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ user_profile.email.id_for_label }}" class="form-label">Email</label>
+                    {{ user_profile.email }}
+                </div>
+                <!-- Add more fields from UserProfile model here -->
+            </div>
+        </div>
+
+        <!-- Add more card sections for other user data as needed -->
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock %}
