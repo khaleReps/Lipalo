@@ -4,9 +4,14 @@ from django_countries.fields import CountryField
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 from django.utils.translation import gettext as _
+from PIL import Image 
+
+
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_image = models.ImageField(upload_to='profile_images/', default='default_profile.png')
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(max_length=100, blank=True, null=True)
@@ -41,6 +46,17 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.full_name
+    
+     # Override the save method to resize the uploaded image
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.profile_image.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.profile_image.path)
 
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -77,11 +93,14 @@ class UserSettings(models.Model):
     custom_report_templates = models.CharField(max_length=100)
     export_formats = models.CharField(max_length=100)
 
+    dark_mode = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Settings for {self.user.username}"
 
 class BusinessProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    logo = models.ImageField(upload_to='business_logos/', default='default_logo.png')
     business_name = models.CharField(max_length=100) 
     business_address = models.TextField(default='N/A')
     currency_used = models.CharField(max_length=3, default='USD')
@@ -100,6 +119,18 @@ class BusinessProfile(models.Model):
 
     def __str__(self):
         return self.business_name
+
+    # Override the save method to resize the uploaded image
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.logo.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.logo.path)
+
 
 class Account(models.Model):
     business_profile = models.ForeignKey(BusinessProfile, on_delete=models.CASCADE)
